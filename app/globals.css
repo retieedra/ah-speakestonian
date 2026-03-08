@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+/* Estonian flag colors: sinimustvalge (blue-black-white) */
+:root {
+  --background: #ffffff;
+  --foreground: #000000;
+  --estonian-blue: #0072ce;
+  --estonian-black: #000000;
+  --estonian-white: #ffffff;
+}
+
+@font-face {
+  font-family: "Aino";
+  src: url("/Aino-Regular/Aino-Regular.woff2") format("woff2"),
+    url("/Aino-Regular/Aino-Regular.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Aino";
+  src: url("/Aino-Bold/Aino-Bold.woff2") format("woff2"),
+    url("/Aino-Bold/Aino-Bold.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Aino Headline";
+  src: url("/Aino-Headline/Aino-Headline.woff2") format("woff2"),
+    url("/Aino-Headline/Aino-Headline.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-estonian-blue: var(--estonian-blue);
+  --color-estonian-black: var(--estonian-black);
+  --color-estonian-white: var(--estonian-white);
+  --font-sans: "Aino", system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, monospace;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: "Aino", system-ui, -apple-system, sans-serif;
+}
