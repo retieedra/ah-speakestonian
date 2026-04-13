@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 const versions = [
@@ -16,8 +17,15 @@ export default function Home() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-white px-6 py-16">
       <div className="mx-auto w-full max-w-lg text-center">
-        <div className="mb-10 flex justify-center">
-          <div className="h-12 w-12 shrink-0 rounded-xl bg-[#0072ce]" />
+        <div className="relative mb-10 h-40 w-full overflow-hidden rounded-2xl shadow-lg ring-1 ring-black/10 sm:h-48">
+          <Image
+            src="/home-hero-tallinn.png"
+            alt="Tallinn Old Town and the Estonian flag"
+            fill
+            className="object-cover object-center"
+            sizes="(max-width: 512px) 100vw, 512px"
+            priority
+          />
         </div>
         <h1 className="mb-3 text-3xl font-bold text-black sm:text-4xl">SpeakEstonian</h1>
         <p className="mb-12 text-base text-black/60 sm:text-lg">
