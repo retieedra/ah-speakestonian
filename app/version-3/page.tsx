@@ -1,5 +1,5 @@
-import VersionLessonShell from "@/components/VersionLessonShell";
+import VersionLessonShellV3 from "@/components/version3/VersionLessonShellV3";
 
 export default function Version3Page() {
-  return <VersionLessonShell />;
+  return <VersionLessonShellV3 />;
 }
