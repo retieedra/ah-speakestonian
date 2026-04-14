@@ -132,14 +132,19 @@ const LESSON_PHRASES: LessonPhrase[] = [
   },
 ];
 
-const QUESTION_TYPES: QuestionType[] = ["multiple_choice", "type", "word_blocks"];
+/** Per phrase: flashcard → MC → word order → type (fixed order for every phrase). */
+const QUESTION_PROGRESSION: QuestionType[] = [
+  "multiple_choice",
+  "word_blocks",
+  "type",
+];
 
 interface SneakPeekLessonV3Props {
   onComplete: () => void;
   onBack?: () => void;
 }
 
-type StepType = "sentence" | "flashcard" | "question";
+type StepType = "flashcard" | "question";
 
 interface LessonStep {
   phraseIndex: number;
@@ -150,18 +155,27 @@ interface LessonStep {
 function buildLessonSteps(): LessonStep[] {
   const steps: LessonStep[] = [];
   for (let i = 0; i < LESSON_PHRASES.length; i++) {
-    steps.push({ phraseIndex: i, stepType: "sentence" });
     steps.push({ phraseIndex: i, stepType: "flashcard" });
-    steps.push({
-      phraseIndex: i,
-      stepType: "question",
-      questionType: QUESTION_TYPES[i % QUESTION_TYPES.length],
-    });
+    for (const questionType of QUESTION_PROGRESSION) {
+      steps.push({
+        phraseIndex: i,
+        stepType: "question",
+        questionType,
+      });
+    }
   }
   return steps;
 }
 
 const LESSON_STEPS = buildLessonSteps();
+
+/** Lenient compare for typed answers: ignore case, collapse spaces, trim outer quotes, optional trailing ! ? . */
+function normalizeTypedPhrase(s: string): string {
+  let t = s.trim().toLowerCase().replace(/\s+/g, " ");
+  t = t.replace(/^["'`\u201C\u201D\u201E]+/, "").replace(/["'`\u201C\u201D\u201E]+$/u, "");
+  t = t.replace(/\s*[!?.…]+$/u, "").trim();
+  return t;
+}
 
 /** Default: purple → blue → green. Accessible: navy → blue → amber (no red–green axis). */
 function progressBarFillColor(
@@ -425,13 +439,11 @@ function TypeQuestion({
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const { colorBlindFriendly: cb } = useColorBlindMode();
 
-  const normalizedAnswer = phrase.estonian.toLowerCase().trim();
-  const normalizedInput = input.toLowerCase().trim();
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (isCorrect === true) return;
-    const correct = normalizedInput === normalizedAnswer;
+    const correct =
+      normalizeTypedPhrase(input) === normalizeTypedPhrase(phrase.estonian);
     setIsCorrect(correct);
     if (correct) {
       setTimeout(onCorrect, 600);
@@ -484,7 +496,8 @@ function TypeQuestion({
               : "mt-4 text-center text-sm text-red-600"
           }
         >
-          The correct answer is &quot;{phrase.estonian}&quot;
+          The correct answer is{" "}
+          <span className="font-semibold text-black">{phrase.estonian}</span>
         </p>
       )}
     </div>
@@ -667,39 +680,6 @@ export default function SneakPeekLessonV3({ onComplete, onBack }: SneakPeekLesso
           ) : (
             <div className={LESSON_CARD_SHELL}>
               <div className={LESSON_CARD_BODY}>
-                {step.stepType === "sentence" && (
-                  <>
-                    <div className="flex flex-col items-center gap-1.5 sm:gap-2">
-                      <div className="flex shrink-0 justify-center">
-                        <Icon size={200} className="sm:hidden" />
-                        <Icon size={200} className="hidden sm:block" />
-                      </div>
-                      <p className="text-center text-xl font-bold text-black sm:text-2xl">
-                        {phrase.sentenceEstonian}
-                      </p>
-                      <p className="text-center text-base text-black/60 sm:text-lg">
-                        {phrase.sentenceEnglish}
-                      </p>
-                      <PronunciationGuide
-                        phrase={phrase}
-                        speakText={phrase.sentenceEstonian}
-                        className="mb-0"
-                      />
-                    </div>
-                    <button
-                      type="button"
-                      onClick={handleNext}
-                      className={
-                        cb
-                          ? "mt-5 w-full min-h-[48px] shrink-0 rounded-xl bg-[#0b4f8c] px-8 py-3 font-semibold text-white transition hover:bg-[#083a68] active:scale-[0.98] sm:mt-6"
-                          : "mt-5 w-full min-h-[48px] shrink-0 rounded-xl bg-[#0072ce] px-8 py-3 font-semibold text-white transition hover:bg-[#0060b3] active:scale-[0.98] sm:mt-6"
-                      }
-                    >
-                      Continue
-                    </button>
-                  </>
-                )}
-
                 {step.stepType === "question" && step.questionType === "multiple_choice" && (
                   <>
                     <div className="flex shrink-0 justify-center">
